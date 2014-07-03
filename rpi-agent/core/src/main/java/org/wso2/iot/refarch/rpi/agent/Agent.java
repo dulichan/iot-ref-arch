@@ -171,6 +171,23 @@ public class Agent {
         return infoObject;
     }
 
+    public static void main(String args[]){
+        Agent a = new Agent();
+        if (args.length > 0 && args[0] != null) {
+            try {
+                a.register(args[0]);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } catch (ExecutionException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        a.run();
+    }
+
+
     public static void startService(){
         System.out.println("Agent starting");
         Agent agent = new Agent();
