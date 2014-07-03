@@ -89,7 +89,6 @@ public class Receiver{
     }
     public static void main(String[] args) {
         Receiver r = new Receiver();
-        System.out.println(args);
         if (args.length > 0 && args[0] != null) {
             try {
                 r.agent.register(args[0]);

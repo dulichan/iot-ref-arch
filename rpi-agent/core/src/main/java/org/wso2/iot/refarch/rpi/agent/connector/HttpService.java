@@ -57,7 +57,7 @@ public class HttpService extends ConnectionService {
         String inputStr;
         while ((inputStr = streamReader.readLine()) != null)
             responseStrBuilder.append(inputStr);
-        System.out.println("Payload sent");
+        System.out.println("Payload sent to "+address);
         return Boolean.parseBoolean(inputStr);
     }
 }
