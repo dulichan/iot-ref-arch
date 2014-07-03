@@ -65,13 +65,25 @@ public class Publisher {
     public static void main(String[] args) {
         int dataPinNumber = DEFAULT_DATA_PIN_NUMBER;
         int updateInterval = DEFAULT_UPDATE_INTERVAL;
-        if (args.length > 0 && args[0] != null) {
-            dataPinNumber = Integer.parseInt(args[0]);
-        } else if(args.length > 1 && args[1] != null) {
+        if(args.length > 1 && args[1] != null) {
             updateInterval = Integer.parseInt(args[1]);
+        } else if (args.length > 2 && args[2] != null) {
+            dataPinNumber = Integer.parseInt(args[2]);
         }
 
-        new Publisher(dataPinNumber).start(updateInterval);
+        Publisher pub = new Publisher(dataPinNumber);
+        if (args.length > 0 && args[0] != null) {
+            try {
+                pub.agent.register(args[0]);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } catch (ExecutionException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        pub.start(updateInterval);
     }
 
     private void start(int updateInterval) {
@@ -99,7 +111,7 @@ public class Publisher {
                 JSONObject infoObject = agent.createInfoObject();
                 //Inserting the sensors payload to info object
                 infoObject.put("sensors", payload);
-                agent.httpService.sendPayload(infoObject);
+                agent.sendPayload(infoObject);
             } catch (MqttException e) {
                 e.printStackTrace();
             } catch (InterruptedException e) {

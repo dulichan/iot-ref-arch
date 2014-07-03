@@ -18,25 +18,26 @@
  */
 package org.wso2.iot.refarch.rpi.agent.connector;
 
+import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.BasicHttpEntity;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.json.simple.JSONObject;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.concurrent.ExecutionException;
 
 /*
     Service class that handles Payload sending to Server
  */
 public class HttpService extends ConnectionService {
-    String address;
-    public HttpService(String address){
-        this.address = address;
+    public HttpService(){
     }
-    public void sendPayload(JSONObject data) throws IOException, ExecutionException, InterruptedException {
+    public Boolean sendPayload(String address, JSONObject data) throws IOException, ExecutionException, InterruptedException {
 
         JSONObject dataObj = new JSONObject();
         dataObj.put("data", data);
@@ -48,7 +49,15 @@ public class HttpService extends ConnectionService {
         BasicHttpEntity he = new BasicHttpEntity();
         he.setContent(new ByteArrayInputStream(dataObj.toString().getBytes()));
         post.setEntity(he);
-        client.execute(post);
+        HttpResponse execute = client.execute(post);
+
+        BufferedReader streamReader = new BufferedReader(new InputStreamReader(execute.getEntity().getContent(), "UTF-8"));
+        StringBuilder responseStrBuilder = new StringBuilder();
+
+        String inputStr;
+        while ((inputStr = streamReader.readLine()) != null)
+            responseStrBuilder.append(inputStr);
         System.out.println("Payload sent");
+        return Boolean.parseBoolean(inputStr);
     }
 }

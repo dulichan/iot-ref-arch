@@ -34,8 +34,10 @@ import org.json.simple.JSONObject;
 import org.wso2.iot.refarch.rpi.agent.connector.HttpService;
 
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -46,19 +48,23 @@ import java.util.concurrent.TimeUnit;
 public class Agent {
 
     HttpService httpService;
+    Properties properties = new Properties();
     {
         /*
             Init block that creates the http service from a config file
         */
         try{
             InputStream is = new FileInputStream("config.properties");
-            Properties properties = new Properties();
+
             properties.load(is);
             System.out.println("Server ip "+properties.getProperty("emmpath"));
-            httpService = new HttpService( properties.getProperty("emmpath"));
+            httpService = new HttpService();
         }catch(Exception e){
             e.printStackTrace();
         }
+    }
+    public Properties getProperties(){
+        return properties;
     }
     /*
         Reads the information of the Pie and construct a JSON Object
@@ -171,6 +177,11 @@ public class Agent {
         agent.run();
         System.out.println("Agent Process started");
     }
+
+    public void sendPayload(JSONObject infoObject) throws InterruptedException, ExecutionException, IOException {
+        httpService.sendPayload(properties.getProperty("emmpath"), infoObject);
+    }
+
     /*
         Periodically send information using the HttpService
     */
@@ -179,11 +190,16 @@ public class Agent {
         public void run() {
             try {
                 JSONObject infoObject = createInfoObject();
-                httpService.sendPayload(infoObject);
+                httpService.sendPayload(properties.getProperty("emmpath"),infoObject);
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
+    }
+    public boolean register(String accessCode) throws InterruptedException, ExecutionException, IOException {
+        JSONObject infoObject = createInfoObject();
+        infoObject.put("register_token", accessCode);
+        return httpService.sendPayload(properties.getProperty("registrationpath"), infoObject);
     }
     /*
         Start a scheduled task for monitoring

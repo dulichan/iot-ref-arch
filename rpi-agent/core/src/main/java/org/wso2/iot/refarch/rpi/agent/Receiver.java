@@ -80,7 +80,7 @@ public class Receiver{
                 JSONObject infoObject = agent.createInfoObject();
                 // If true - Fan is on. If false Fan is off.
                 infoObject.put("actuator", pin.isHigh());
-                agent.httpService.sendPayload(infoObject);
+                agent.sendPayload(infoObject);
             } catch (Exception e) {
                 e.printStackTrace();
             }
