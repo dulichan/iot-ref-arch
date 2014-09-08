@@ -16,7 +16,6 @@ class MqttCommunication:
 		self.client = mqtt.Client()
 		self.client.on_connect = on_connect
 		self.client.on_message = on_message
-		print host
 		self.client.connect(host, 1883, 60)
 
 	def publish(self, topic, qos, input):
