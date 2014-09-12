@@ -1,8 +1,8 @@
-from core import Process
+from core.Process import Process
 from communication.MqttCommunication import MqttCommunication
 import json
 
-class HumidityPublisher(Process.Process):
+class HumidityPublisher(Process):
 	def __init__(self):
 		self.com = MqttCommunication()
 		pass
