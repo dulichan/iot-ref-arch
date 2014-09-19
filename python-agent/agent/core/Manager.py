@@ -14,8 +14,6 @@ class Manager:
                 passing the token. At this time a challenge token will be generated based on hardware.
         '''
         challenge = self.generate_challege()
-
-        properties = self.properties()
         payload = {
             "auth": "token",
             "auth_params": {
