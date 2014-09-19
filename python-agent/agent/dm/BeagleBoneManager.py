@@ -8,3 +8,12 @@ class BeagleBoneManager(Manager):
 
 	def platform(self):
 		return "BeagleBone"
+
+	def mac(self):
+		return "62:03:08:1a:01:00"
+
+	def version(self):
+		return "10.9.3"
+
+	def properties(self):
+		pass

@@ -1,3 +1,4 @@
 # Engine to run agent periodically +
 # Engine to reload publishers once publishers are added +
+# Enrollment +
 # Setup topics and endpoints from Device Management

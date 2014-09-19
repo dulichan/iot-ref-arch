@@ -4,6 +4,7 @@ import glob
 import pkgutil
 import sys
 import argparse
+import platform
 #from custom.TemperaturePublisher import TemperaturePublisher
 #from custom.HumidityPublisher import HumidityPublisher
 
@@ -16,9 +17,15 @@ parser = argparse.ArgumentParser()
 parser.add_argument("--token")
 args = parser.parse_args()
 
-args.token = '9c6c4c7e-39da-11e4-84d8-164230d1df67'
+args.token = 'g35uueltru5'
 # if the token doesn't exists - ask the agent to enroll the device
-if(args.token):
-    agent.enroll(args.token)
+#if(args.token):
+#    agent.enroll(args.token)
 
 # agent.execute()
+
+print platform.machine()
+print platform.architecture()
+print platform.node()
+print platform.platform()
+print platform.processor()

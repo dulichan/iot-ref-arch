@@ -52,7 +52,7 @@ class Agent:
         '''
         Reload processors
         '''
-        path = os.path.join(os.path.dirname(__file__), "custom")
+        path = os.path.join(os.path.dirname(__file__), "custom/publishers")
         modules = pkgutil.iter_modules(path=[path])
 
         for loader, mod_name, ispkg in modules:
