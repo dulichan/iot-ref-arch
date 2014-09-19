@@ -14,6 +14,3 @@ class BeagleBoneManager(Manager):
 
 	def version(self):
 		return "10.9.3"
-
-	def properties(self):
-		pass

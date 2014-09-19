@@ -19,13 +19,7 @@ args = parser.parse_args()
 
 args.token = 'g35uueltru5'
 # if the token doesn't exists - ask the agent to enroll the device
-#if(args.token):
-#    agent.enroll(args.token)
+if(args.token):
+   agent.enroll(args.token)
 
 # agent.execute()
-
-print platform.machine()
-print platform.architecture()
-print platform.node()
-print platform.platform()
-print platform.processor()
