@@ -22,7 +22,7 @@ class Manager:
             "properties": {
              	"platform": self.platform(),
              	"version" : self.version(),
-                "extra": device_info()
+                "extra": self.device_info()
             }
         }
 
@@ -30,7 +30,7 @@ class Manager:
         headers = {'content-type': "application/json"}
         print payload
         response = requests.post(
-            "https://10.100.0.210:9443/emm/api/devices/iot/register", headers=headers, data=payload, verify=False)
+            "https://10.100.0.151:9443/emm/api/devices/iot/register", headers=headers, data=payload, verify=False)
         print response.text
 
     def device_properties(self):
