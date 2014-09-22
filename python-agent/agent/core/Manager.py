@@ -103,7 +103,6 @@ def get_device_manager():
         TODO: Obtain the device type bundles by reading the dm module. 
     '''
     platform = platform_name()
-    platform = "beaglebone"
     if platform=="raspberrypi":
         return RaspberryPiManager()
     elif platform=="beaglebone":
