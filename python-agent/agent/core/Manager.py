@@ -2,12 +2,14 @@ import requests
 import json
 import platform
 
+
 class Manager:
 
     '''
             The Core Manager is responsible for managing platform indepenant management tasks
             also the core manager switches the manager based on the platform type
     '''
+
     def enroll(self, token):
         '''
                 Enrollment process for Device involves calling an API of a server through HTTP
@@ -15,8 +17,8 @@ class Manager:
         '''
         challenge = self.generate_challege()
         properties = self.flatten_device_info(self.device_info())
-        properties.platform = self.platform()
-        properties.version = self.version()
+        properties["platform"] = self.platform()
+        properties["version"] = self.version()
         payload = {
             "auth": "token",
             "auth_params": {
@@ -47,17 +49,17 @@ class Manager:
             This method flattens the device info. 
         '''
         props = {
-            "Python Version": device_info.python_info.version,
-            "Python Compiler": device_info.python_info.compiler,
-            "Python Build Name": device_info.python_info.build[0],
-            "Python Build Date": device_info.python_info.build[1],
-            "Kernal Name": device_info.platform.normal,
+            "Python Version": device_info["python_info"]["version"],
+            "Python Compiler": device_info["python_info"]["compiler"],
+            "Python Build Name": device_info["python_info"]["build"][0],
+            "Python Build Date": device_info["python_info"]["build"][1],
+            "Kernal Name": device_info["platform"]["normal"],
             "Platform Name": platform_name(),
-            "Node": device_info.hardware.node,
-            "System": device_info.system,
-            "Machine": device_info.machine
+            "Node": device_info["hardware"]["node"],
+            "System": device_info["hardware"]["system"],
+            "Machine": device_info["hardware"]["machine"]
         }
-        pass
+        return props
     def device_info(self):
         '''
             Device Info is sent only when the device is getting registered to the Device Manager. This
@@ -101,11 +103,13 @@ def get_device_manager():
         TODO: Obtain the device type bundles by reading the dm module. 
     '''
     platform = platform_name()
+    platform = "beaglebone"
     if platform=="raspberrypi":
         return RaspberryPiManager()
     elif platform=="beaglebone":
         return BeagleBoneManager()
-    return 
-#Avoiding circular depenency [refer - http://effbot.org/zone/import-confusion.htm]
+    return
+# Avoiding circular depenency [refer -
+# http://effbot.org/zone/import-confusion.htm]
 from dm.RaspberryPiManager import RaspberryPiManager
 from dm.BeagleBoneManager import BeagleBoneManager
