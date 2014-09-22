@@ -1,7 +1,6 @@
 import requests
 import json
 import platform
-import dm
 
 class Manager:
 
@@ -103,7 +102,10 @@ def get_device_manager():
     '''
     platform = platform_name()
     if platform=="raspberrypi":
-        return dm.RaspberryPiManager()
+        return RaspberryPiManager()
     elif platform=="beaglebone":
-        return dm.BeagleBoneManager()
+        return BeagleBoneManager()
     return 
+#Avoiding circular depenency [refer - http://effbot.org/zone/import-confusion.htm]
+from dm.RaspberryPiManager import RaspberryPiManager
+from dm.BeagleBoneManager import BeagleBoneManager
