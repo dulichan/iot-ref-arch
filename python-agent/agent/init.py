@@ -17,9 +17,9 @@ parser = argparse.ArgumentParser()
 parser.add_argument("--token")
 args = parser.parse_args()
 
-args.token = 'g35uueltru5'
 # if the token doesn't exists - ask the agent to enroll the device
 if(args.token):
    agent.enroll(args.token)
+   pass
 
 # agent.execute()

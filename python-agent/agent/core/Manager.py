@@ -1,6 +1,7 @@
 import requests
 import json
 import platform
+import dm
 
 class Manager:
 
@@ -14,16 +15,15 @@ class Manager:
                 passing the token. At this time a challenge token will be generated based on hardware.
         '''
         challenge = self.generate_challege()
+        properties = self.flatten_device_info(self.device_info())
+        properties.platform = self.platform()
+        properties.version = self.version()
         payload = {
             "auth": "token",
             "auth_params": {
                 "token": token
             },
-            "properties": {
-             	"platform": self.platform(),
-             	"version" : self.version(),
-                "extra": self.device_info()
-            }
+            "properties": properties
         }
 
         payload = json.dumps(payload)
@@ -42,6 +42,23 @@ class Manager:
         }
         return info
 
+    def flatten_device_info(self, device_info):
+        '''
+            Currently the server side is not robust to display rich information obtained from different types of devices.
+            This method flattens the device info. 
+        '''
+        props = {
+            "Python Version": device_info.python_info.version,
+            "Python Compiler": device_info.python_info.compiler,
+            "Python Build Name": device_info.python_info.build[0],
+            "Python Build Date": device_info.python_info.build[1],
+            "Kernal Name": device_info.platform.normal,
+            "Platform Name": platform_name(),
+            "Node": device_info.hardware.node,
+            "System": device_info.system,
+            "Machine": device_info.machine
+        }
+        pass
     def device_info(self):
         '''
             Device Info is sent only when the device is getting registered to the Device Manager. This
@@ -73,3 +90,21 @@ class Manager:
             }
         }
         return props
+
+def platform_name():
+    '''
+    The logic of getting the second index item from uname() is incorrect in Mac
+    '''
+    return platform.uname()[1]
+
+def get_device_manager():
+    '''
+        TODO: Obtain the device type bundles by reading the dm module. 
+    '''
+    platform_name = platform_name()
+    print platform_name
+    if platform_name=="raspberrypi":
+        return dm.RaspberryPiManager()
+    elif platform_name=="beaglebone":
+        return dm.BeagleBoneManager()
+    return 

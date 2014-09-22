@@ -1,4 +1,4 @@
-from dm.BeagleBoneManager import BeagleBoneManager
+import core.Manager as Manager
 import time
 import threading
 import ConfigParser
@@ -23,7 +23,8 @@ class Agent:
         self.load_manager()
 
     def load_manager(self):
-        self.manager = BeagleBoneManager()
+        #self.manager = RaspberryPiManager()
+        self.manager = Manager.get_device_manager()
 
     def enroll(self, token):
         self.manager.enroll(token)
