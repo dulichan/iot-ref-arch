@@ -25,6 +25,8 @@ class Agent:
     def load_manager(self):
         #self.manager = RaspberryPiManager()
         self.manager = Manager.get_device_manager()
+        if(self.manager==None):
+            raise Exception("No Device Manager found for Platform")
 
     def enroll(self, token):
         self.manager.enroll(token)
