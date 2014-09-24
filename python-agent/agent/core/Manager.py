@@ -2,14 +2,17 @@ import requests
 import json
 import platform
 
-
 class Manager:
-
     '''
             The Core Manager is responsible for managing platform indepenant management tasks
             also the core manager switches the manager based on the platform type
     '''
 
+    def configureDMURL(self, dmURL):
+        '''
+        Setup the device Management url     
+        '''
+        self.dmURL = dmURL
     def enroll(self, token):
         '''
                 Enrollment process for Device involves calling an API of a server through HTTP
@@ -31,7 +34,7 @@ class Manager:
         headers = {'content-type': "application/json"}
         print payload
         response = requests.post(
-            "https://10.100.0.151:9443/emm/api/devices/iot/register", headers=headers, data=payload, verify=False)
+            self.dmURL+"emm/api/devices/iot/register", headers=headers, data=payload, verify=False)
         print response.text
 
     def device_properties(self):
@@ -107,7 +110,7 @@ def get_device_manager():
         return RaspberryPiManager()
     elif platform=="beaglebone":
         return BeagleBoneManager()
-    return
+    return None
 # Avoiding circular depenency [refer -
 # http://effbot.org/zone/import-confusion.htm]
 from dm.RaspberryPiManager import RaspberryPiManager
