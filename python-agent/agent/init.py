@@ -33,15 +33,16 @@ agent = Agent()
 parser = argparse.ArgumentParser()
 parser.add_argument("--token")
 parser.add_argument("--dmURL")
-#args.token = "sdfsdf"
 args = parser.parse_args()
+args.token = "sdfsdf"
 # if the token doesn't exists - ask the agent to enroll the device
+if(args.dmURL):
+	agent.configureDMURL(args.dmURL)
+else:
+	agent.configureDMURL("https://localhost:9443/")
+
 if(args.token):
 	agent.enroll(args.token)
 
-if(args.dmURL):
-	agent.dmURL = args.dmURL
-else:
-	agent.dmURL = "https://localhost:9443/"
 
 # agent.execute()
