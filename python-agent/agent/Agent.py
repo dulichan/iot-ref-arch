@@ -22,33 +22,73 @@ import ConfigParser
 import os
 import pkgutil
 import sys
+import argparse
 
 class Agent:
 
-    process_list = []
+    def start(self):
+        self.load_manager()
+        arguments = self.pass_arguments()
+        if(arguments.dmURL):
+            self.configure_dm_url(arguments.dmURL)
+        else:
+            self.configure_dm_url("https://localhost:9443/")
+
+        if(arguments.token):
+            # if the token doesn't exists - ask the agent to enroll the device
+            self.manager.enroll(self, arguments.token)
+        else:
+            enroll = self.agent_params['enroll']
+            if(enroll):            
+                print "Device was enrolled to Device Manager previously"
+            else:
+                self.manager.enroll(self)   
+
+    def pass_arguments(self):
+        '''
+            Parse command line arguments for the token
+        '''
+        parser = argparse.ArgumentParser()
+        parser.add_argument("--token")
+        parser.add_argument("--dmURL")
+        args = parser.parse_args()
+        # args.token = "sdfsdf"
+        return args
 
     def __init__(self):
-        self.Config = ConfigParser.ConfigParser()
-        self.Config.read("config.conf")
-        self.timer = self.Config.get('agent', 'timer')
-        print self.timer
-        self.timer_interval = float(self.Config.get('agent', 'timer_interval'))
-        self.autoload = self.Config.get('agent', 'autoload')
+        '''
+            Parse config files and setup agent variables
+        '''
+        self.config = ConfigParser.ConfigParser()
+        self.config.read("config.conf")
 
-        # Load the manager based on the board
-        self.load_manager()
+        self.process_list = {}
+        self.agent_params = {}
 
-    def configureDMURL(self, dmURL):
-        self.manager.configureDMURL(dmURL)
+        # Runtime configs
+        self.agent_params['timer'] = self.config.get('agent', 'timer')
+        self.agent_params['timer_interval'] = float(self.config.get('agent', 'timer_interval'))
+        self.agent_params['autoload'] = self.config.get('agent', 'autoload')
+
+        # Security code
+        if(self.config.has_section('security')):
+            self.agent_params['access_token'] = self.config.get('security', 'access_token')
+            self.agent_params['refresh_token'] = self.config.get('security', 'refresh_token')
+            self.agent_params['enroll'] = self.config.get('security', 'enroll')
+        else:
+            self.agent_params['enroll'] = False
+
+    def configure_dm_url(self, dm_url):
+        self.manager.configure_dm_url(dm_url)
 
     def load_manager(self):
+        '''
+            Load the Platform specific Device Manager implementation using the core Device Manager
+        '''
         #self.manager = RaspberryPiManager()
         self.manager = Manager.get_device_manager()
         if(self.manager==None):
             raise Exception("No Device Manager found for Platform")
-
-    def enroll(self, token):
-        self.manager.enroll(token)
 
     def add_process(self, process):
         self.process_list.append(process)

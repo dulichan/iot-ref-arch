@@ -19,18 +19,27 @@ import requests
 import json
 import platform
 
+
 class Manager:
+
     '''
             The Core Manager is responsible for managing platform indepenant management tasks
             also the core manager switches the manager based on the platform type
     '''
 
-    def configureDMURL(self, dmURL):
+    def is_enrolled(self, agent):
+        '''
+            Responsible for finding if the device has been enrolled to the DM
+        '''
+        return agent.Config.get('agent', 'enrollment')
+
+    def configure_dm_url(self, dm_url):
         '''
         Setup the device Management url     
         '''
-        self.dmURL = dmURL
-    def enroll(self, token):
+        self.dm_url = dm_url
+
+    def enroll(self, agent, token=None):
         '''
                 Enrollment process for Device involves calling an API of a server through HTTP
                 passing the token. At this time a challenge token will be generated based on hardware.
@@ -39,21 +48,44 @@ class Manager:
         properties = self.flatten_device_info(self.device_info())
         properties["platform"] = self.platform()
         properties["version"] = self.version()
+        
         payload = {
             "auth": "token",
-            "auth_params": {
-                "token": token
-            },
+            "auth_params": {},
             "properties": properties
         }
+        # Add the token to payload if token is available
+        if(token != None):
+            print "Token found. Starting token based enrollment <!!!>"
+            payload['auth_params']['token'] = token
+        else:
+            print "Token not found. Starting self enrollment <!!!>"
+        
 
         payload = json.dumps(payload)
         headers = {'content-type': "application/json"}
+        print "Payload <--->"
         print payload
+        print "Payload End <***>"
         response = requests.post(
-            self.dmURL+"emm/api/devices/iot/register", headers=headers, data=payload, verify=False)
+            self.dm_url + "emm/api/devices/iot/register", headers=headers, data=payload, verify=False)
+        print "Response <--->"
         print response.text
+        print "Response End <***>"
+        if(response.status_code==200):
+            response = json.loads(response.text)
+            self.set_tokens(agent, response["payload"]["tokens"]["access_token"], response[
+                             "payload"]["tokens"]["refresh_token"])
+        else:
+            print "Error!!!"
 
+    def set_tokens(self, agent, access_token, refresh_token):
+        agent.config.set('agent', 'enrollment', True)
+        agent.config.set(
+            'agent', 'access_token', access_token)
+        agent.config.set('agent', 'refresh_token', refresh_token)
+        with open('config.conf', 'w') as f:
+            agent.config.write(f)
     def device_properties(self):
         '''
             Device Properties are sent to the Device Manager in each monitoring interval 
@@ -80,6 +112,7 @@ class Manager:
             "Machine": device_info["hardware"]["machine"]
         }
         return props
+
     def device_info(self):
         '''
             Device Info is sent only when the device is getting registered to the Device Manager. This
@@ -93,15 +126,15 @@ class Manager:
                 "compiler": platform.python_compiler(),
                 "build": platform.python_build()
             },
-            "platform":{
+            "platform": {
                 "normal": platform.platform(),
                 "alias": platform.platform(aliased=True),
-                "terse":platform.platform(terse=True)
+                "terse": platform.platform(terse=True)
             },
-            "os":{
+            "os": {
                 "name": platform.uname()
             },
-            "hardware":{
+            "hardware": {
                 "system": platform.system(),
                 "node": platform.node(),
                 "release": platform.release(),
@@ -112,11 +145,13 @@ class Manager:
         }
         return props
 
+
 def platform_name():
     '''
     The logic of getting the second index item from uname() is incorrect in Mac
     '''
     return platform.uname()[1]
+
 
 def get_device_manager():
     '''
@@ -124,9 +159,9 @@ def get_device_manager():
     '''
     platform = platform_name()
     platform = "raspberrypi"
-    if platform=="raspberrypi":
+    if platform == "raspberrypi":
         return RaspberryPiManager()
-    elif platform=="beaglebone":
+    elif platform == "beaglebone":
         return BeagleBoneManager()
     return None
 # Avoiding circular depenency [refer -

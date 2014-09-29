@@ -20,7 +20,6 @@ import os
 import glob
 import pkgutil
 import sys
-import argparse
 import platform
 #from custom.TemperaturePublisher import TemperaturePublisher
 #from custom.HumidityPublisher import HumidityPublisher
@@ -28,21 +27,7 @@ import platform
 from communication.MqttCommunication import MqttCommunication
 
 agent = Agent()
-
-# Parse command line arguments for the token
-parser = argparse.ArgumentParser()
-parser.add_argument("--token")
-parser.add_argument("--dmURL")
-args = parser.parse_args()
-args.token = "sdfsdf"
-# if the token doesn't exists - ask the agent to enroll the device
-if(args.dmURL):
-	agent.configureDMURL(args.dmURL)
-else:
-	agent.configureDMURL("https://localhost:9443/")
-
-if(args.token):
-	agent.enroll(args.token)
-
+agent.start()
+# agent.start(args)
 
 # agent.execute()
