@@ -16,6 +16,7 @@
     under the License.
 '''
 import core.Manager as Manager
+from custom.publishers.TemperaturePublisher import TemperaturePublisher
 import time
 import threading
 import ConfigParser
@@ -32,7 +33,7 @@ class Agent:
         if(arguments.dmURL):
             self.configure_dm_url(arguments.dmURL)
         else:
-            self.configure_dm_url("https://localhost:9443/")
+            self.configure_dm_url("https://localhost:9453/")
 
         if(arguments.token):
             # if the token doesn't exists - ask the agent to enroll the device
@@ -43,6 +44,8 @@ class Agent:
                 print "Device was enrolled to Device Manager previously"
             else:
                 self.manager.enroll(self)   
+        self.add_process(TemperaturePublisher())
+        self.execute()
 
     def pass_arguments(self):
         '''
@@ -62,7 +65,7 @@ class Agent:
         self.config = ConfigParser.ConfigParser()
         self.config.read("config.conf")
 
-        self.process_list = {}
+        self.process_list = []
         self.agent_params = {}
 
         # Runtime configs
@@ -104,11 +107,11 @@ class Agent:
             print "Executing process"
             process.run()
 
-        if self.autoload == 'True':
+        if self.agent_params['autoload'] == 'True':
             self.reload()
 
-        if self.timer == 'True':
-            threading.Timer(self.timer_interval, self.execute).start()
+        if self.agent_params['timer'] == 'True':
+            threading.Timer(self.agent_params['timer_interval'], self.execute).start()
 
     def reload(self):
         '''
@@ -120,10 +123,10 @@ class Agent:
         for loader, mod_name, ispkg in modules:
             # Ensure that module isn't already loaded
             # print mod_name not in sys.modules
-            if "custom." + mod_name not in sys.modules:
+            if "custom.publishers." + mod_name not in sys.modules:
             # Import module
                 loaded_mod = __import__(
-                    "custom" + "." + mod_name, fromlist=[mod_name])
+                    "custom.publishers" + "." + mod_name, fromlist=[mod_name])
 
                 # Load class from imported module
                 class_name = mod_name

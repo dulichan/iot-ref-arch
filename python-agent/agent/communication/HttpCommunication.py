@@ -22,17 +22,17 @@ class HttpCommunication:
 	def __init__(self, host="http://localhost", port=80):
 		self.host = host
 		self.port = port
+		self.endpoint = self.host+":"+str(self.port)
 
-	def callback_function(response):
+	def callback_function(self, response):
   		response.code # The HTTP status code
   		response.headers # The HTTP headers
   		response.body # The parsed response
   		response.raw_body # The unparsed response
+  		print response.code
 
-
-	def publish(self, endpoint, data_type, input):
+	def publish(self, data_type, input, endpoint):
 		payload = input
 		headers = {'content-type': data_type}
-		endpoint = self.host+":"+str(self.port)+"/"+endpoint
 		thread = unirest.post(endpoint, params=payload, headers=headers, callback=self.callback_function)
 		pass

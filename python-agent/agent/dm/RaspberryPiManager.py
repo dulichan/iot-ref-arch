@@ -16,6 +16,7 @@
 	under the License.
 '''
 from core.Manager import Manager
+import os
 class RaspberryPiManager(Manager):
 	def generate_challege(self):
 		'''
@@ -32,6 +33,10 @@ class RaspberryPiManager(Manager):
 	def version(self):
 		return "Model B"
 
+	def shutdown():
+		os.system("sudo shutdown -h now")
+	def reboot():
+		os.system("sudo reboot")
 	def getserial():
 		'''
 			http://www.raspberrypi-spy.co.uk/2012/09/getting-your-raspberry-pi-serial-number-using-python/

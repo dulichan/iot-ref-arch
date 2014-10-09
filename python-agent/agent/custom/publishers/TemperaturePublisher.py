@@ -18,23 +18,49 @@
 from core import Process
 from communication import HttpCommunication
 import json
-
+import commands
+import random
 class TemperaturePublisher(Process.Process):
-	def __init__(self):
-		self.com = HttpCommunication.HttpCommunication("http://localhost", 3000)
-		pass
 
-	def run(self):
-		'''
-			Main task of the Process. This is used to read perform some 
-			device operations to collect data
-		'''
-		input = {"temperature": 20}
-		self.publish(input)
+    def __init__(self):
+        self.com = HttpCommunication.HttpCommunication(
+            "http://localhost", 3000)
+        pass
 
-	def publish(self, input):
-		''' 
-			Publish the data collected!
-		'''
-		input = json.dumps(input)
-		self.com.publish("temperature", "application/json", input)
+    def get_cpu_temp(self):
+        tempFile = open("/sys/class/thermal/thermal_zone0/temp")
+        cpu_temp = tempFile.read()
+        tempFile.close()
+        return float(cpu_temp) / 1000
+        # Uncomment the next line if you want the temp in Fahrenheit
+        # return float(1.8*cpu_temp)+32
+
+    def get_gpu_temp(self):
+        gpu_temp = commands.getoutput('/opt/vc/bin/vcgencmd measure_temp').replace(
+            'temp=', '').replace('\'C', '')
+        return float(gpu_temp)
+        # Uncomment the next line if you want the temp in Fahrenheit
+        # return float(1.8* gpu_temp)+32
+
+    def run(self):
+        '''
+                Main task of the Process. This is used to read perform some
+                device operations to collect data
+        '''
+        input = {
+            "event": {
+                "payloadData": {
+                    "tenantId": "100",
+                    "deviceId": "data4",
+                    "temperature": random.randint(0,100)
+                }
+            }
+        }
+        self.publish(input)
+
+    def publish(self, input):
+        '''
+                Publish the data collected!
+        '''
+        input = json.dumps(input)
+        self.com.publish("application/json", input, "http://localhost:9763/endpoints/http/jsonBuilder")
