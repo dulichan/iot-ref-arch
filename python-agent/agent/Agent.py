@@ -73,15 +73,14 @@ class Agent:
         self.agent_params['timer_interval'] = float(self.config.get('agent', 'timer_interval'))
         self.agent_params['autoload'] = self.config.get('agent', 'autoload')
 
-        self.configs['deviceId'] = device_id()
+        self.configs['deviceId'] = self.config.get('agent', 'enrollment')
 
         # Security code
         if(self.config.has_section('security')):
             self.agent_params['access_token'] = self.config.get('security', 'access_token')
             self.agent_params['refresh_token'] = self.config.get('security', 'refresh_token')
             self.agent_params['enroll'] = self.config.get('security', 'enroll')
-        else:
-            self.agent_params['enroll'] = False
+        
 
     def configure_dm_url(self, dm_url):
         self.manager.configure_dm_url(dm_url)
