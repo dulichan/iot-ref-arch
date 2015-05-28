@@ -73,7 +73,7 @@ class Agent:
         self.agent_params['timer_interval'] = float(self.config.get('agent', 'timer_interval'))
         self.agent_params['autoload'] = self.config.get('agent', 'autoload')
 
-        self.configs['deviceId']
+        self.configs['deviceId'] = device_id()
 
         # Security code
         if(self.config.has_section('security')):
