@@ -67,11 +67,13 @@ class Agent:
 
         self.process_list = []
         self.agent_params = {}
-
+        self.configs = {}
         # Runtime configs
         self.agent_params['timer'] = self.config.get('agent', 'timer')
         self.agent_params['timer_interval'] = float(self.config.get('agent', 'timer_interval'))
         self.agent_params['autoload'] = self.config.get('agent', 'autoload')
+
+        self.configs['deviceId']
 
         # Security code
         if(self.config.has_section('security')):

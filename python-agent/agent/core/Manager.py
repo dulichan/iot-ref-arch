@@ -46,44 +46,54 @@ class Manager:
         '''
         challenge = self.generate_challege()
         properties = self.flatten_device_info(self.device_info())
-        properties["platform"] = self.platform()
-        properties["version"] = self.version()
-        
+        properties["Platform"] = self.platform()
+        properties["Version"] = self.version()
+        properties["Serial"] = self.device_id()
+        prop_list = []
+        for key, value in iteritems():
+            temp = {"name": key, "value": value}
+            prop_list.append(temp)
+
         payload = {
-            "auth": "token",
-            "auth_params": {},
-            "properties": properties
-        }
+            "deviceIdentifier": self.device_id(),
+            "properties": prop_list
+        };
+        # payload = {
+        #     "auth": "token",
+        #     "auth_params": {},
+        #     "properties": properties
+        # }
         # Add the token to payload if token is available
-        if(token != None):
-            print "Token found. Starting token based enrollment <!!!>"
-            payload['auth_params']['token'] = token
-        else:
-            print "Token not found. Starting self enrollment <!!!>"
+        #if(token != None):
+            #print "Token found. Starting token based enrollment <!!!>"
+            #payload['auth_params']['token'] = token
+        #else:
+        print "Token not found. Starting self enrollment <!!!>"
         
 
         payload = json.dumps(payload)
-        headers = {'content-type': "application/json"}
+        headers = {'Content-Type': "application/json", 'Accept': "application/json"}
         print "Payload <--->"
         print payload
         print "Payload End <***>"
         response = requests.post(
-            self.dm_url + "emm/api/devices/iot/register", headers=headers, data=payload, verify=False)
+            self.dm_url + "TemperatureSensorPluginProject/enrollment/enroll", headers=headers, data=payload, verify=False)
         print "Response <--->"
         print response.text
         print "Response End <***>"
         if(response.status_code==200):
             response = json.loads(response.text)
-            self.set_tokens(agent, response["payload"]["tokens"]["access_token"], response[
-                             "payload"]["tokens"]["refresh_token"])
+            #self.set_tokens(agent, response["payload"]["tokens"]["access_token"], response[
+                             #"payload"]["tokens"]["refresh_token"])
+            set_tokens(agent)
         else:
             print "Error!!!"
 
-    def set_tokens(self, agent, access_token, refresh_token):
+    def set_tokens(self, agent):
         agent.config.set('agent', 'enrollment', True)
-        agent.config.set(
-            'agent', 'access_token', access_token)
-        agent.config.set('agent', 'refresh_token', refresh_token)
+        #agent.config.set(
+            #'agent', 'access_token', access_token)
+        #agent.config.set('agent', 'refresh_token', refresh_token)
         with open('config.conf', 'w') as f:
             agent.config.write(f)
     def device_properties(self):

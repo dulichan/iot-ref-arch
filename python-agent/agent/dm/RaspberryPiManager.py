@@ -18,6 +18,8 @@
 from core.Manager import Manager
 import os
 class RaspberryPiManager(Manager):
+
+
 	def generate_challege(self):
 		'''
 			Generate a challenge token based on a hardware property
@@ -28,8 +30,11 @@ class RaspberryPiManager(Manager):
 		return "RaspberryPi"
 
 	def mac(self):
-		return "62:03:08:1a:01:00"
+		return getserial()
 
+	def device_id(self):
+		return getserial()
+		
 	def version(self):
 		return "Model B"
 
@@ -37,6 +42,7 @@ class RaspberryPiManager(Manager):
 		os.system("sudo shutdown -h now")
 	def reboot():
 		os.system("sudo reboot")
+
 	def getserial():
 		'''
 			http://www.raspberrypi-spy.co.uk/2012/09/getting-your-raspberry-pi-serial-number-using-python/

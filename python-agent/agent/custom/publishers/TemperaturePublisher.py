@@ -20,6 +20,8 @@ from communication import HttpCommunication
 import json
 import commands
 import random
+import Adafruit_DHT
+
 class TemperaturePublisher(Process.Process):
 
     def __init__(self):
@@ -42,22 +44,33 @@ class TemperaturePublisher(Process.Process):
         # Uncomment the next line if you want the temp in Fahrenheit
         # return float(1.8* gpu_temp)+32
 
+    def get_dht_temp(self):
+        sensor = Adafruit_DHT.DHT11
+        pin = '4'
+        humidity, temperature = Adafruit_DHT.read_retry(sensor, pin)
+        return (humidity, temperature)
+
+    def __init__(self):
+        run()
+
     def run(self):
         '''
                 Main task of the Process. This is used to read perform some
                 device operations to collect data
         '''
-        input = {
+        humidity, temperature  = get_dht_temp()
+        if humidity is not None and temperature is not None:
+            input = {
             "event": {
                 "payloadData": {
                     "tenantId": "100",
                     "deviceId": "data4",
-                    "temperature": random.randint(0,100)
+                    "temperature": temperature,
+                    "humidity": humidity
                 }
             }
         }
-        self.publish(input)
-
+        self.publish(input)  
     def publish(self, input):
         '''
                 Publish the data collected!
