@@ -24,19 +24,18 @@ class MqttCommunication:
 		# reconnect then subscriptions will be renewed.
 		client.subscribe("$SYS/#")
 
-	# The callback for when a PUBLISH message is received from the server.
-	def on_message(client, userdata, msg):
-		print(msg.topic+" "+str(msg.payload))
-
-	def __init__(self, host="localhost", port=1883, on_connect=on_connect, on_message=on_message):
+	def __init__(self, host="localhost", port=1883, mqttResponder=MqttResponder(), on_connect=on_connect):
 		#self.host = host
 		self.client = mqtt.Client()
 		self.client.on_connect = on_connect
-		self.client.on_message = on_message
+		self.client.on_message = mqttResponder.on_message
 		self.client.connect(host, 1883, 60)
 
 	def publish(self, topic, qos, input):
-	#def publish(self):	
 		self.client.publish(topic, payload=input, qos=qos)
 
+class MqttResponder:
+	# The callback for when a PUBLISH message is received from the server.
+	def on_message(client, userdata, msg):
+		print(msg.topic+" "+str(msg.payload))	
 	

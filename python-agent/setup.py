@@ -6,5 +6,6 @@ setup(
         'unirest',
         'requests',
         'paho-mqtt',
+        'import Adafruit_DHT'
     ]
 )
