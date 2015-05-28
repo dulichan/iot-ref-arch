@@ -24,7 +24,6 @@ import platform
 #from custom.TemperaturePublisher import TemperaturePublisher
 #from custom.HumidityPublisher import HumidityPublisher
 
-from communication.MqttCommunication import MqttCommunication
 
 agent = Agent()
 agent.start()
