@@ -16,7 +16,7 @@
     under the License.
 '''
 import core.Manager as Manager
-from custom.publishers.TemperaturePublisher import TemperaturePublisher
+#from custom.publishers.TemperaturePublisher import TemperaturePublisher
 import time
 import threading
 import ConfigParser
@@ -44,7 +44,7 @@ class Agent:
                 print "Device was enrolled to Device Manager previously"
             else:
                 self.manager.enroll(self)   
-        self.add_process(TemperaturePublisher())
+        #self.add_process(TemperaturePublisher())
         self.execute()
 
     def pass_arguments(self):
@@ -72,15 +72,17 @@ class Agent:
         self.agent_params['timer'] = self.config.get('agent', 'timer')
         self.agent_params['timer_interval'] = float(self.config.get('agent', 'timer_interval'))
         self.agent_params['autoload'] = self.config.get('agent', 'autoload')
-
-        self.configs['deviceId'] = self.config.get('agent', 'enrollment')
+        if(self.config.has_option('agent', 'enroll')):
+            self.agent_params['enroll'] = self.config.get('agent', 'enroll')
+        else:
+            self.agent_params['enroll'] = False
+        #self.configs['deviceId'] = self.config.get('agent', 'enrollment')
 
         # Security code
         if(self.config.has_section('security')):
             self.agent_params['access_token'] = self.config.get('security', 'access_token')
             self.agent_params['refresh_token'] = self.config.get('security', 'refresh_token')
             self.agent_params['enroll'] = self.config.get('security', 'enroll')
-        
 
     def configure_dm_url(self, dm_url):
         self.manager.configure_dm_url(dm_url)

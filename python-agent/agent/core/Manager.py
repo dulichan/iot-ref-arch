@@ -18,8 +18,11 @@
 import requests
 import json
 import platform
-
-
+from requests.adapters import HTTPAdapter
+from requests.packages.urllib3.poolmanager import PoolManager
+import ssl
+# Regarding [Errno 8] _ssl.c:507: EOF occurred in violation of protocol
+#http://stackoverflow.com/questions/29134512/insecureplatformwarning-a-true-sslcontext-object-is-not-available-this-prevent 
 class Manager:
 
     '''
@@ -50,7 +53,7 @@ class Manager:
         properties["Version"] = self.version()
         properties["Serial"] = self.device_id()
         prop_list = []
-        for key, value in iteritems():
+        for key, value in properties.iteritems():
             temp = {"name": key, "value": value}
             prop_list.append(temp)
 
@@ -73,24 +76,28 @@ class Manager:
 
         payload = json.dumps(payload)
         headers = {'Content-Type': "application/json", 'Accept': "application/json"}
+        url = self.dm_url + "temp-controller-agentr/enrollment/enroll"
+        print "URL <--->"
+        print url
+        print "URL End <***>"
         print "Payload <--->"
         print payload
         print "Payload End <***>"
         response = requests.post(
-            self.dm_url + "TemperatureSensorPluginProject/enrollment/enroll", headers=headers, data=payload, verify=False)
+            url, headers=headers, data=payload, verify=False)
         print "Response <--->"
-        print response.text
+        #print response.text
         print "Response End <***>"
         if(response.status_code==200):
-            response = json.loads(response.text)
+            #response = json.loads(response.text)
             #self.set_tokens(agent, response["payload"]["tokens"]["access_token"], response[
                              #"payload"]["tokens"]["refresh_token"])
-            set_tokens(agent)
+            self.set_tokens(agent)
         else:
             print "Error!!!"
 
     def set_tokens(self, agent):
-        agent.config.set('agent', 'enrollment', True)
+        agent.config.set('agent', 'enroll', True)
         #agent.config.set(
             #'agent', 'access_token', access_token)
         #agent.config.set('agent', 'refresh_token', refresh_token)

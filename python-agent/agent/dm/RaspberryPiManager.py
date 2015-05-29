@@ -30,11 +30,11 @@ class RaspberryPiManager(Manager):
 		return "RaspberryPi"
 
 	def mac(self):
-		return getserial()
+		return self.getserial()
 
 	def device_id(self):
-		return getserial()
-		
+		return self.getserial()
+
 	def version(self):
 		return "Model B"
 
@@ -43,7 +43,7 @@ class RaspberryPiManager(Manager):
 	def reboot():
 		os.system("sudo reboot")
 
-	def getserial():
+	def getserial(self):
 		'''
 			http://www.raspberrypi-spy.co.uk/2012/09/getting-your-raspberry-pi-serial-number-using-python/
 		'''
